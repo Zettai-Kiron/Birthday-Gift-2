@@ -15,26 +15,26 @@ const pages = [
     title: 'As long as you’re smiling, I’m happy.',
     media: [{ type: 'image', src: '/media/Pic3.jpg', alt: 'Birthday Photo 3' }],
   },
-  {
-    title: 'Stay happy, my dear.',
-    media: [{ type: 'video', src: '/media/Vid4.mp4', alt: 'Birthday Video 4' }],
-  },
-  {
-    title: 'You are my favorite story.',
-    media: [{ type: 'image', src: '/media/Pic8.png', alt: 'Birthday Photo 5' }],
-  },
-  {
-    title: 'A story I want to read forever.',
-    media: [{ type: 'video', src: '/media/Vid2.mp4', alt: 'Birthday Video 2' }],
-  },
-  {
-    title: 'You are a wonderful favorite story.',
-    media: [{ type: 'image', src: '/media/Pic4.jpg', alt: 'Birthday Photo 4' }],
-  },
-  {
-    title: 'Our memories keep going...',
-    media: [{ type: 'video', src: '/media/Vid3.mp4', alt: 'Birthday Video 3' }],
-  },
+  // {
+  //   title: 'Stay happy, my dear.',
+  //   media: [{ type: 'video', src: '/media/Vid4.mp4', alt: 'Birthday Video 4' }],
+  // },
+  // {
+  //   title: 'You are my favorite story.',
+  //   media: [{ type: 'image', src: '/media/Pic8.png', alt: 'Birthday Photo 5' }],
+  // },
+  // {
+  //   title: 'A story I want to read forever.',
+  //   media: [{ type: 'video', src: '/media/Vid2.mp4', alt: 'Birthday Video 2' }],
+  // },
+  // {
+  //   title: 'You are a wonderful favorite story.',
+  //   media: [{ type: 'image', src: '/media/Pic4.jpg', alt: 'Birthday Photo 4' }],
+  // },
+  // {
+  //   title: 'Our memories keep going...',
+  //   media: [{ type: 'video', src: '/media/Vid3.mp4', alt: 'Birthday Video 3' }],
+  // },
 ];
 
 function HeartIntro({ onComplete }) {
@@ -245,7 +245,7 @@ function GiftCard({ onFinish }) {
   );
 }
 
-function Fireworks() {
+function Fireworks({ onFinish }) {
   const canvasRef = useRef(null);
 
   useEffect(() => {
@@ -316,11 +316,103 @@ function Fireworks() {
   }, []);
 
   return (
-    <div className="fireworks-screen">
+    <div className="fireworks-screen" onClick={onFinish} style={{ cursor: 'pointer' }}>
       <canvas ref={canvasRef} className="fireworks-canvas" />
       <div className="final-message">
         <h1>Happy Birthday ❤️!</h1>
         <p>The Story continues. The future is definitely going to be great</p>
+        <p style={{ marginTop: '2rem', fontSize: '1.2rem', opacity: 0.8 }}>Tap to see one last surprise...</p>
+      </div>
+    </div>
+  );
+}
+
+function TurtleHeart() {
+  const canvasRef = useRef(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    let animationFrameId;
+
+    // Heart functions
+    function hearta(k) {
+        return 15 * Math.pow(Math.sin(k), 3);
+    }
+
+    function heartb(k) {
+        return 12 * Math.cos(k)
+            - 5 * Math.cos(2 * k)
+            - 2 * Math.cos(3 * k)
+            - Math.cos(4 * k);
+    }
+
+    let i = 0;
+
+    function resize() {
+      // Full screen canvas
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      startDrawing();
+    }
+
+    function startDrawing() {
+      if (animationFrameId) cancelAnimationFrame(animationFrameId);
+
+      // Reset transform to clear screen
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.fillStyle = 'black';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Move origin to center
+      ctx.translate(canvas.width / 2, canvas.height / 2);
+
+      i = 0;
+
+      function drawStep() {
+        if (i < 300) {
+          ctx.fillStyle = "red";
+          
+          let x = hearta(i) * 20;
+          let y = -heartb(i) * 20; // Note: added negative to keep heart right-side up for HTML Canvas
+
+          // Draw dot (small circle)
+          ctx.beginPath();
+          ctx.arc(x, y, 2, 0, Math.PI * 2);
+          ctx.fill();
+
+          i++;
+          animationFrameId = requestAnimationFrame(drawStep);
+        } else {
+          // Restart loop to keep drawing
+          i = 0;
+          ctx.setTransform(1, 0, 0, 1, 0, 0);
+          ctx.fillStyle = 'black';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.translate(canvas.width / 2, canvas.height / 2);
+          animationFrameId = requestAnimationFrame(drawStep);
+        }
+      }
+
+      drawStep();
+    }
+
+    window.addEventListener('resize', resize);
+    resize();
+
+    return () => {
+      window.removeEventListener('resize', resize);
+      if (animationFrameId) cancelAnimationFrame(animationFrameId);
+    };
+  }, []);
+
+  return (
+    <div className="turtle-heart-screen" style={{ width: '100%', height: '100vh', margin: 0, padding: 0, overflow: 'hidden', backgroundColor: 'black', position: 'relative' }}>
+      <canvas ref={canvasRef} style={{ display: 'block', width: '100%', height: '100%', position: 'absolute', left: 0, top: 0, zIndex: 0 }} />
+      <div className="final-message" style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 10, textAlign: 'center', pointerEvents: 'none' }}>
+        <h1 style={{ color: 'white', textShadow: '0 0 20px rgba(255,255,255,0.8), 0 0 10px rgba(255,77,151,0.8)' }}>Happy Birthday ❤️!</h1>
+        <p style={{ color: 'white', marginTop: '1rem', fontSize: '1.2rem', textShadow: '0 0 15px rgba(255,255,255,0.8), 0 0 8px rgba(255,77,151,0.8)' }}>The Story continues. The future is definitely going to be great</p>
       </div>
     </div>
   );
@@ -332,7 +424,8 @@ export default function App() {
   const content = useMemo(() => {
     if (stage === 'intro') return <HeartIntro onComplete={() => setStage('card')} />;
     if (stage === 'card') return <GiftCard onFinish={() => setStage('finale')} />;
-    return <Fireworks />;
+    if (stage === 'finale') return <Fireworks onFinish={() => setStage('turtleHeart')} />;
+    return <TurtleHeart />;
   }, [stage]);
 
   return (
