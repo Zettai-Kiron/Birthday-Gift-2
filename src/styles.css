@@ -48,37 +48,62 @@ body {
 }
 
 .countdown {
-  position: absolute;
-  top: 60%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: clamp(4rem, 12vw, 11rem);
+  position: relative;
+  z-index: 1;
+  font-size: clamp(4rem, 20vw, 11rem);
   letter-spacing: 0.1em;
   color: #ff7cb4;
   text-shadow: 0 0 50px rgba(255, 124, 180, 0.6);
+  line-height: 1;
+  margin: 0.15em 0;
 }
 
 .hero-text {
-  position: absolute;
-  top: 10%;
-  left: 50%;
-  transform: translateX(-50%);
+  position: relative;
+  z-index: 1;
   width: 90%;
-  font-size: clamp(2rem, 4vw, 5rem);
-  letter-spacing: 0.1em;
+  font-size: clamp(1.5rem, 6vw, 3.5rem);
+  letter-spacing: 0.08em;
   color: #ffffff;
   text-transform: uppercase;
   font-weight: 800;
+  margin: 0;
+  text-align: center;
+  text-shadow: 0 0 30px rgba(255, 124, 180, 0.4);
 }
 
 .subtext {
-  position: absolute;
-  top: 45%;
-  left: 50%;
-  transform: translateX(-50%);
+  position: relative;
+  z-index: 1;
   width: 90%;
-  color: rgba(255, 255, 255, 0.75);
-  font-size: clamp(1rem, 1.7vw, 1.5rem);
+  color: rgba(255, 255, 255, 0.80);
+  font-size: clamp(0.95rem, 3.5vw, 1.4rem);
+  margin: 0;
+  text-align: center;
+}
+
+/* Mobile intro tweaks */
+@media (max-width: 480px) {
+  .hero-screen {
+    gap: 0.75rem !important;
+    padding: 1.5rem 1rem !important;
+    justify-content: center;
+  }
+
+  .countdown {
+    font-size: clamp(3.5rem, 22vw, 6rem);
+    margin: 0.1em 0;
+  }
+
+  .hero-text {
+    font-size: clamp(1.3rem, 7vw, 2rem);
+    width: 95%;
+  }
+
+  .subtext {
+    font-size: clamp(0.85rem, 4vw, 1.1rem);
+    width: 95%;
+  }
 }
 
 .gift-card-screen {

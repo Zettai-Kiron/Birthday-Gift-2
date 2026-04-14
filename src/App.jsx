@@ -134,15 +134,19 @@ function HeartIntro({ onComplete }) {
   }
 
   return (
-    <div className="hero-screen" onClick={handleStart} style={{ cursor: started ? 'default' : 'pointer', position: 'relative', overflow: 'hidden' }}>
+    <div
+      className="hero-screen"
+      onClick={handleStart}
+      style={{ cursor: started ? 'default' : 'pointer', position: 'relative', overflow: 'hidden', gap: '1rem', padding: '2rem 1rem' }}
+    >
       <canvas ref={canvasRef} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} />
+      <div className="hero-text">Happy Birthday Love 🎂</div>
+      <div className="subtext">Let's start the celebration! 🥳🥳</div>
       {!started ? (
-        <div className="countdown" style={{ fontSize: 'clamp(2rem, 6vw, 4rem)', whiteSpace: 'nowrap', position: 'relative', zIndex: 1 }}>Tap to Start</div>
+        <div className="countdown" style={{ fontSize: 'clamp(2rem, 8vw, 4rem)', whiteSpace: 'nowrap' }}>Tap to Start ✨</div>
       ) : (
-        <div className="countdown" style={{ position: 'relative', zIndex: 1 }}>{count >= 0 ? count : ''}</div>
+        <div className="countdown">{count >= 0 ? count : ''}</div>
       )}
-      <div className="hero-text" style={{ position: 'relative', zIndex: 1 }}>Happy Birthday Love</div>
-      <div className="subtext" style={{ position: 'relative', zIndex: 1 }}>Let's start the celebration!🥳🥳</div>
     </div>
   );
 }
