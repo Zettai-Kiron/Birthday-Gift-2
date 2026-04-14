@@ -444,11 +444,112 @@ function TurtleHeart() {
   );
 }
 
+
+const BIRTHDAY_NAME = 'Kiron';
+
+function BirthdaySplash({ onComplete }) {
+  const canvasRef = useRef(null);
+  const [visible, setVisible] = useState(false);
+
+  // Auto-advance after 4 seconds (or tap to skip)
+  useEffect(() => {
+    const t = setTimeout(() => onComplete(), 4500);
+    return () => clearTimeout(t);
+  }, [onComplete]);
+
+  // Fade in after a tiny delay
+  useEffect(() => {
+    const t = setTimeout(() => setVisible(true), 80);
+    return () => clearTimeout(t);
+  }, []);
+
+  // Matrix rain canvas
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    let animFrame;
+
+    const chars = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホ♥★◆▲●0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const fontSize = 16;
+    let cols = [];
+
+    function resize() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      const colCount = Math.floor(canvas.width / fontSize);
+      cols = Array.from({ length: colCount }, () => Math.random() * -canvas.height / fontSize);
+    }
+
+    function draw() {
+      // Semi-transparent black overlay for trail effect
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.06)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      cols.forEach((y, i) => {
+        const char = chars[Math.floor(Math.random() * chars.length)];
+        const x = i * fontSize;
+
+        // Gradient: bright magenta head, dimmer pink trail
+        const brightness = Math.random();
+        if (brightness > 0.95) {
+          ctx.fillStyle = '#ffffff'; // Occasional white flash
+        } else if (brightness > 0.7) {
+          ctx.fillStyle = '#ff2d9b'; // Hot pink
+        } else {
+          ctx.fillStyle = '#c0206e'; // Deep pink
+        }
+
+        ctx.font = `${fontSize}px monospace`;
+        ctx.fillText(char, x, y * fontSize);
+
+        cols[i] += 0.5;
+        if (y * fontSize > canvas.height && Math.random() > 0.975) {
+          cols[i] = 0;
+        }
+      });
+    }
+
+    function loop() {
+      draw();
+      animFrame = requestAnimationFrame(loop);
+    }
+
+    resize();
+    window.addEventListener('resize', resize);
+    loop();
+
+    return () => {
+      window.removeEventListener('resize', resize);
+      cancelAnimationFrame(animFrame);
+    };
+  }, []);
+
+  return (
+    <div
+      className="splash-screen"
+      onClick={onComplete}
+      style={{
+        opacity: visible ? 1 : 0,
+        transition: 'opacity 0.6s ease',
+      }}
+    >
+      <canvas ref={canvasRef} className="splash-canvas" />
+      <div className="splash-message">
+        <p className="splash-sub">Happy Birthday to</p>
+        <h1 className="splash-name">{BIRTHDAY_NAME.toUpperCase()}</h1>
+        <p className="splash-tap">Tap to continue</p>
+      </div>
+    </div>
+  );
+}
+
 export default function App() {
   const [stage, setStage] = useState('intro');
 
   const content = useMemo(() => {
-    if (stage === 'intro') return <HeartIntro onComplete={() => setStage('card')} />;
+    if (stage === 'intro') return <HeartIntro onComplete={() => setStage('splash')} />;
+    if (stage === 'splash') return <BirthdaySplash onComplete={() => setStage('card')} />;
     if (stage === 'card') return <GiftCard onFinish={() => setStage('turtleHeart')} />;
     return <TurtleHeart />;
   }, [stage]);
