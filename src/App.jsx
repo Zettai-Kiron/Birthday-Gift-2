@@ -39,62 +39,84 @@ const pages = [
 
 function HeartIntro({ onComplete }) {
   const canvasRef = useRef(null);
-  const countdownRef = useRef(null);
   const [count, setCount] = useState(5);
+  const [started, setStarted] = useState(false);
 
+  // Fireworks background
   useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
+    let animationFrame;
+    let particles = [];
 
     function resize() {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
-      draw();
+    }
+
+    function createParticle(x, y, hue) {
+      const speed = Math.random() * 4 + 2;
+      const angle = Math.random() * Math.PI * 2;
+      return {
+        x, y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        alpha: 1,
+        hue,
+      };
+    }
+
+    function createFirework() {
+      const x = Math.random() * canvas.width;
+      const y = Math.random() * canvas.height * 0.6 + canvas.height * 0.1;
+      const hue = Math.random() * 360;
+      for (let i = 0; i < 30; i++) {
+        particles.push(createParticle(x, y, hue));
+      }
     }
 
     function draw() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      const heartCenterX = canvas.width / 2;
-      const heartCenterY = canvas.height / 2 - 80;
-
-      ctx.fillStyle = '#ff4d97';
-      for (let i = 0; i < 360; i++) {
-        const k = (i * Math.PI) / 180;
-        const x = 15 * Math.pow(Math.sin(k), 3) * 20 + heartCenterX;
-        const y = -(12 * Math.cos(k) - 5 * Math.cos(2 * k) - 2 * Math.cos(3 * k) - Math.cos(4 * k)) * 20 + heartCenterY;
+      ctx.fillStyle = 'rgba(4, 8, 26, 0.2)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      particles = particles.filter((p) => p.alpha > 0.02);
+      particles.forEach((p) => {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.04;
+        p.alpha *= 0.96;
         ctx.beginPath();
-        ctx.arc(x, y, 3, 0, Math.PI * 2);
+        ctx.arc(p.x, p.y, 2.8, 0, Math.PI * 2);
+        ctx.fillStyle = `hsla(${p.hue}, 100%, 70%, ${p.alpha})`;
         ctx.fill();
-      }
+      });
+    }
 
-      ctx.save();
-      ctx.fillStyle = 'rgba(255,77,151,0.18)';
-      ctx.filter = 'blur(28px)';
-      ctx.beginPath();
-      ctx.arc(heartCenterX, heartCenterY, 250, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.restore();
+    function loop() {
+      if (Math.random() < 0.07) createFirework();
+      draw();
+      animationFrame = requestAnimationFrame(loop);
     }
 
     resize();
     window.addEventListener('resize', resize);
+    loop();
 
-    return () => window.removeEventListener('resize', resize);
+    return () => {
+      window.removeEventListener('resize', resize);
+      cancelAnimationFrame(animationFrame);
+    };
   }, []);
 
-  const [started, setStarted] = useState(false);
-
+  // Countdown logic
   useEffect(() => {
     if (!started) return;
     if (count < 0) {
       onComplete();
       return;
     }
-
     const timer = setTimeout(() => {
       setCount((current) => current - 1);
     }, 1000);
-
     return () => clearTimeout(timer);
   }, [count, started, onComplete]);
 
@@ -112,15 +134,15 @@ function HeartIntro({ onComplete }) {
   }
 
   return (
-    <div className="hero-screen" onClick={handleStart} style={{ cursor: started ? 'default' : 'pointer' }}>
-      <canvas ref={canvasRef} className="heart-canvas" />
+    <div className="hero-screen" onClick={handleStart} style={{ cursor: started ? 'default' : 'pointer', position: 'relative', overflow: 'hidden' }}>
+      <canvas ref={canvasRef} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} />
       {!started ? (
-        <div className="countdown" style={{ fontSize: 'clamp(2rem, 6vw, 4rem)', whiteSpace: 'nowrap' }}>Tap to Start</div>
+        <div className="countdown" style={{ fontSize: 'clamp(2rem, 6vw, 4rem)', whiteSpace: 'nowrap', position: 'relative', zIndex: 1 }}>Tap to Start</div>
       ) : (
-        <div className="countdown">{count >= 0 ? count : ''}</div>
+        <div className="countdown" style={{ position: 'relative', zIndex: 1 }}>{count >= 0 ? count : ''}</div>
       )}
-      <div className="hero-text">Happy Birthday Love</div>
-      <div className="subtext">Let's start the celebration!🥳🥳</div>
+      <div className="hero-text" style={{ position: 'relative', zIndex: 1 }}>Happy Birthday Love</div>
+      <div className="subtext" style={{ position: 'relative', zIndex: 1 }}>Let's start the celebration!🥳🥳</div>
     </div>
   );
 }
@@ -423,8 +445,7 @@ export default function App() {
 
   const content = useMemo(() => {
     if (stage === 'intro') return <HeartIntro onComplete={() => setStage('card')} />;
-    if (stage === 'card') return <GiftCard onFinish={() => setStage('finale')} />;
-    if (stage === 'finale') return <Fireworks onFinish={() => setStage('turtleHeart')} />;
+    if (stage === 'card') return <GiftCard onFinish={() => setStage('turtleHeart')} />;
     return <TurtleHeart />;
   }, [stage]);
 
