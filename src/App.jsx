@@ -446,32 +446,60 @@ function TurtleHeart() {
 
 
 const BIRTHDAY_NAME = 'Kiron';
+const WORDS = ['Happy', 'Birthday', 'to', BIRTHDAY_NAME];
+
+// Timings per word (ms)
+const FADE_IN  = 400;
+const HOLD     = 2000;
+const FADE_OUT = 400;
+const WORD_TOTAL = FADE_IN + HOLD + FADE_OUT;
 
 function BirthdaySplash({ onComplete }) {
   const canvasRef = useRef(null);
-  const [visible, setVisible] = useState(false);
 
-  // Auto-advance after 4 seconds (or tap to skip)
+  // Which word is showing (-1 = none yet)
+  const [wordIdx, setWordIdx] = useState(-1);
+  // CSS opacity for the current word
+  const [wordOpacity, setWordOpacity] = useState(0);
+
+  // Sequence: cycle through each word, then call onComplete
   useEffect(() => {
-    const t = setTimeout(() => onComplete(), 4500);
-    return () => clearTimeout(t);
+    const timers = [];
+
+    WORDS.forEach((_, i) => {
+      const start = i * WORD_TOTAL;
+
+      // Fade in
+      timers.push(setTimeout(() => {
+        setWordIdx(i);
+        setWordOpacity(1);
+      }, start));
+
+      // Fade out
+      timers.push(setTimeout(() => {
+        setWordOpacity(0);
+      }, start + FADE_IN + HOLD));
+
+      // Hide (clear word) after fade out completes
+      timers.push(setTimeout(() => {
+        setWordIdx(-1);
+      }, start + WORD_TOTAL));
+    });
+
+    // Advance to cards after last word fully fades
+    const totalTime = WORDS.length * WORD_TOTAL + 300;
+    timers.push(setTimeout(onComplete, totalTime));
+
+    return () => timers.forEach(clearTimeout);
   }, [onComplete]);
 
-  // Fade in after a tiny delay
-  useEffect(() => {
-    const t = setTimeout(() => setVisible(true), 80);
-    return () => clearTimeout(t);
-  }, []);
-
-  // Matrix rain canvas
+  // Matrix rain — only "2"
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     let animFrame;
-
-    const chars = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホ♥★◆▲●0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    const fontSize = 16;
+    const fontSize = 18;
     let cols = [];
 
     function resize() {
@@ -482,38 +510,20 @@ function BirthdaySplash({ onComplete }) {
     }
 
     function draw() {
-      // Semi-transparent black overlay for trail effect
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.06)';
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.07)';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
-
       cols.forEach((y, i) => {
-        const char = chars[Math.floor(Math.random() * chars.length)];
         const x = i * fontSize;
-
-        // Gradient: bright magenta head, dimmer pink trail
-        const brightness = Math.random();
-        if (brightness > 0.95) {
-          ctx.fillStyle = '#ffffff'; // Occasional white flash
-        } else if (brightness > 0.7) {
-          ctx.fillStyle = '#ff2d9b'; // Hot pink
-        } else {
-          ctx.fillStyle = '#c0206e'; // Deep pink
-        }
-
-        ctx.font = `${fontSize}px monospace`;
-        ctx.fillText(char, x, y * fontSize);
-
-        cols[i] += 0.5;
-        if (y * fontSize > canvas.height && Math.random() > 0.975) {
-          cols[i] = 0;
-        }
+        const b = Math.random();
+        ctx.fillStyle = b > 0.96 ? '#ffffff' : b > 0.65 ? '#ff2d9b' : '#c0206e';
+        ctx.font = `bold ${fontSize}px monospace`;
+        ctx.fillText('2', x, y * fontSize);
+        cols[i] += 0.6;
+        if (y * fontSize > canvas.height && Math.random() > 0.97) cols[i] = 0;
       });
     }
 
-    function loop() {
-      draw();
-      animFrame = requestAnimationFrame(loop);
-    }
+    function loop() { draw(); animFrame = requestAnimationFrame(loop); }
 
     resize();
     window.addEventListener('resize', resize);
@@ -525,24 +535,29 @@ function BirthdaySplash({ onComplete }) {
     };
   }, []);
 
+  const isName = wordIdx === WORDS.length - 1;
+
   return (
-    <div
-      className="splash-screen"
-      onClick={onComplete}
-      style={{
-        opacity: visible ? 1 : 0,
-        transition: 'opacity 0.6s ease',
-      }}
-    >
+    <div className="splash-screen" onClick={onComplete}>
       <canvas ref={canvasRef} className="splash-canvas" />
-      <div className="splash-message">
-        <p className="splash-sub">Happy Birthday to</p>
-        <h1 className="splash-name">{BIRTHDAY_NAME.toUpperCase()}</h1>
-        <p className="splash-tap">Tap to continue</p>
-      </div>
+
+      {wordIdx >= 0 && (
+        <div
+          className="splash-word-wrap"
+          style={{
+            opacity: wordOpacity,
+            transition: `opacity ${wordOpacity === 1 ? FADE_IN : FADE_OUT}ms ease`,
+          }}
+        >
+          <span className={`splash-word ${isName ? 'splash-word--name' : ''}`}>
+            {WORDS[wordIdx]}
+          </span>
+        </div>
+      )}
     </div>
   );
 }
+
 
 export default function App() {
   const [stage, setStage] = useState('intro');
