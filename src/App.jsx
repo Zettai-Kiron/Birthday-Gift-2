@@ -114,6 +114,14 @@ function HeartIntro({ onComplete }) {
       onComplete();
       return;
     }
+    // Start music the moment the countdown hits 0
+    if (count === 0) {
+      const audio = document.getElementById('bg-music');
+      if (audio) {
+        audio.currentTime = 0;
+        audio.play().catch(e => console.log('Music play failed:', e));
+      }
+    }
     const timer = setTimeout(() => {
       setCount((current) => current - 1);
     }, 1000);
@@ -141,7 +149,7 @@ function HeartIntro({ onComplete }) {
     >
       <canvas ref={canvasRef} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} />
       <div className="hero-text">Happy Birthday Love 🎂</div>
-      <div className="subtext">Let's start the celebration! 🥳🥳</div>
+      {/* <div className="subtext">Let's start the celebration! 🥳🥳</div> */}
       {!started ? (
         <div className="countdown" style={{ fontSize: 'clamp(2rem, 8vw, 4rem)', whiteSpace: 'nowrap' }}>Tap to Start ✨</div>
       ) : (
@@ -347,7 +355,7 @@ function Fireworks({ onFinish }) {
       <div className="final-message">
         <h1>Happy Birthday ❤️!</h1>
         <p>The Story continues. The future is definitely going to be great</p>
-        <p style={{ marginTop: '2rem', fontSize: '1.2rem', opacity: 0.8 }}>Tap to see one last surprise...</p>
+        {/* <p style={{ marginTop: '2rem', fontSize: '1.2rem', opacity: 0.8 }}>Tap to see one last surprise...</p> */}
       </div>
     </div>
   );
@@ -364,14 +372,14 @@ function TurtleHeart() {
 
     // Heart functions
     function hearta(k) {
-        return 15 * Math.pow(Math.sin(k), 3);
+      return 15 * Math.pow(Math.sin(k), 3);
     }
 
     function heartb(k) {
-        return 12 * Math.cos(k)
-            - 5 * Math.cos(2 * k)
-            - 2 * Math.cos(3 * k)
-            - Math.cos(4 * k);
+      return 12 * Math.cos(k)
+        - 5 * Math.cos(2 * k)
+        - 2 * Math.cos(3 * k)
+        - Math.cos(4 * k);
     }
 
     let i = 0;
@@ -399,7 +407,7 @@ function TurtleHeart() {
       function drawStep() {
         if (i < 300) {
           ctx.fillStyle = "red";
-          
+
           let x = hearta(i) * 20;
           let y = -heartb(i) * 20; // Note: added negative to keep heart right-side up for HTML Canvas
 
@@ -445,13 +453,12 @@ function TurtleHeart() {
 }
 
 
-const BIRTHDAY_NAME = 'Kiron';
-const WORDS = ['Happy', 'Birthday', 'to', BIRTHDAY_NAME];
+const WORDS = ['Happy', 'Birthday', 'to', 'Jude', 'Kiron', 'Mensah',];
 
 // Timings per word (ms)
-const FADE_IN  = 400;
-const HOLD     = 2000;
-const FADE_OUT = 400;
+const FADE_IN = 400;
+const HOLD = 1000;
+const FADE_OUT = 200;
 const WORD_TOTAL = FADE_IN + HOLD + FADE_OUT;
 
 function BirthdaySplash({ onComplete }) {
@@ -518,7 +525,7 @@ function BirthdaySplash({ onComplete }) {
         ctx.fillStyle = b > 0.96 ? '#ffffff' : b > 0.65 ? '#ff2d9b' : '#c0206e';
         ctx.font = `bold ${fontSize}px monospace`;
         ctx.fillText('2', x, y * fontSize);
-        cols[i] += 0.6;
+        cols[i] += 0.35;
         if (y * fontSize > canvas.height && Math.random() > 0.97) cols[i] = 0;
       });
     }
