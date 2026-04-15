@@ -15,26 +15,26 @@ const pages = [
     title: 'As long as you’re smiling, I’m happy.',
     media: [{ type: 'image', src: '/media/Pic3.jpg', alt: 'Birthday Photo 3' }],
   },
-  // {
-  //   title: 'Stay happy, my dear.',
-  //   media: [{ type: 'video', src: '/media/Vid4.mp4', alt: 'Birthday Video 4' }],
-  // },
-  // {
-  //   title: 'You are my favorite story.',
-  //   media: [{ type: 'image', src: '/media/Pic8.png', alt: 'Birthday Photo 5' }],
-  // },
-  // {
-  //   title: 'A story I want to read forever.',
-  //   media: [{ type: 'video', src: '/media/Vid2.mp4', alt: 'Birthday Video 2' }],
-  // },
-  // {
-  //   title: 'You are a wonderful favorite story.',
-  //   media: [{ type: 'image', src: '/media/Pic4.jpg', alt: 'Birthday Photo 4' }],
-  // },
-  // {
-  //   title: 'Our memories keep going...',
-  //   media: [{ type: 'video', src: '/media/Vid3.mp4', alt: 'Birthday Video 3' }],
-  // },
+  {
+    title: 'Stay happy, my dear.',
+    media: [{ type: 'video', src: '/media/Vid4.mp4', alt: 'Birthday Video 4' }],
+  },
+  {
+    title: 'You are my favorite story.',
+    media: [{ type: 'image', src: '/media/Pic8.png', alt: 'Birthday Photo 5' }],
+  },
+  {
+    title: 'A story I want to read forever.',
+    media: [{ type: 'video', src: '/media/Vid2.mp4', alt: 'Birthday Video 2' }],
+  },
+  {
+    title: 'You are a wonderful favorite story.',
+    media: [{ type: 'image', src: '/media/Pic4.jpg', alt: 'Birthday Photo 4' }],
+  },
+  {
+    title: 'Our memories keep going...',
+    media: [{ type: 'video', src: '/media/Vid3.mp4', alt: 'Birthday Video 3' }],
+  },
 ];
 
 function HeartIntro({ onComplete }) {
